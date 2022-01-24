@@ -3,12 +3,14 @@ package com.example.farm;
 import com.example.farm.mappers.FarmMapper;
 import com.example.farm.model.FarmDetail;
 import com.example.farm.model.FarmDetailDto;
+import com.example.farm.model.MetricType;
 import com.example.farm.repository.FarmDetailRepository;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Component;
 
 import java.io.FileReader;
@@ -17,7 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-class StartUpRunner implements CommandLineRunner {
+public class StartUpRunner implements CommandLineRunner {
 
 //    private FarmRepository farmRepository;
 //    private MetricRepository metricRepository;
@@ -28,12 +30,6 @@ class StartUpRunner implements CommandLineRunner {
 
     @Override
     public void run (String... args) throws Exception {
-//        if (farmRepository.count() == 0) {
-//            saveFarmToDB();
-//        }
-//        if (metricRepository.count() == 0){
-//            saveMetricToDB();
-//        }
 
         if (farmDetailsRepository.count() == 0){
             List<String> fileNames = Arrays.asList("friman_metsola.csv", "Nooras_farm.csv", "ossi_farm.csv", "PartialTech.csv");
@@ -47,6 +43,12 @@ class StartUpRunner implements CommandLineRunner {
     }
 
     private List<FarmDetailDto> readFileData(String fileName) throws Exception {
+
+        Set<String> sensors = new HashSet<>();
+        sensors.add(MetricType.temperature.toString());
+        sensors.add(MetricType.pH.toString());
+        sensors.add(MetricType.rainFall.toString());
+
         CSVReader reader=
                 new CSVReaderBuilder(new FileReader("src/main/java/com/example/farm/FarmCsv/"+fileName)).
                         withSkipLines(1). // Skiping firstline as it is header
@@ -55,13 +57,19 @@ class StartUpRunner implements CommandLineRunner {
         List<FarmDetailDto> csvObjectList=reader.readAll().stream().map(data-> {
             String location = data[0];
             String datetime = data[1];
-            String sensorType = data[2];
+            String sensorType = (sensors.contains(data[2])) ? data[2] : MetricType.Invalid.toString();
             String value = data[3];
 
-            BigDecimal metricVal = new BigDecimal(value);
+            BigDecimal metricVal = (value.isEmpty() || value.equalsIgnoreCase("null")) ?
+                    new BigDecimal(0) : new BigDecimal(value);
 
             String[] input = location.split(" ");
-            location = input[0];
+            location = input[0]+""+input[1];
+
+            if(location.contains("\'")){
+                String[] input2 = location.split("\'");
+                location = input2[0]+""+input2[1];
+            }
 
             FarmDetailDto farmDto = new FarmDetailDto();
             farmDto.setFarm(location);
@@ -75,27 +83,6 @@ class StartUpRunner implements CommandLineRunner {
 
         return csvObjectList;
     }
-
-//    private void saveFarmToDB() {
-//        List<String> farms = Arrays.asList("Friman Metsola", "Noora's farm", "PartialTech Research Farm", "Organic Ossi's Impact That Lasts plantase");
-//        for (var farmName : farms) {
-//            Farm farm = new Farm();
-//            farm.setFarmName(farmName);
-//            farmRepository.save(farm);
-//        }
-//    }
-//
-//    private void saveMetricToDB() {
-//        MetricType[] metrics = MetricType.values();
-//        for (int i = 0; i < metrics.length; i++) {
-//            MetricType metricStr = metrics[i];
-//            Metric metric = new Metric();
-//            metric.setType(metricStr);
-//
-//            metricRepository.save(metric);
-//        }
-
-    //}
 
 
 }

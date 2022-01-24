@@ -7,8 +7,10 @@ import com.example.farm.model.MetricType;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Component
 public class FarmMapper {
@@ -22,7 +24,8 @@ public class FarmMapper {
         farmDetail.setFarm(Farm.valueOf(farmDetailDto.getFarm()));
         farmDetail.setId(farmDetailDto.getId());
         farmDetail.setMetric(MetricType.valueOf(farmDetailDto.getMetric()));
-        farmDetail.setDateTime(LocalDateTime.parse(farmDetailDto.getDateTime()));
+        farmDetail.setDateTime(LocalDateTime.parse(farmDetailDto.getDateTime(),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH)));
         farmDetail.setMetricValue(farmDetailDto.getMetricValue());
 
         return farmDetail;

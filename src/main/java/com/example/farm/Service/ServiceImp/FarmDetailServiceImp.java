@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class FarmDetailServiceImp implements FarmDetailService {
@@ -47,7 +49,8 @@ public class FarmDetailServiceImp implements FarmDetailService {
     @Override
     public List<FarmDetailDto> fetchDataByMonthAndYear (String dateTime) {
 
-        LocalDateTime localDateTime = LocalDateTime.parse(dateTime);
+        LocalDateTime localDateTime = LocalDateTime.parse(dateTime,
+                DateTimeFormatter.ofPattern("2018-04-10T04:00:00.000Z", Locale.ENGLISH));
 
         List<FarmDetail> details = farmDetailRepositoryImpl.findByMonthAndYear(String.valueOf(localDateTime.getMonth()),
                 String.valueOf(localDateTime.getYear()));

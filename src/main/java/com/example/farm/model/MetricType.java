@@ -17,6 +17,8 @@ public enum MetricType {
 
     @Min(0)
     @Max(14)
-    pH
+    pH,
+
+    Invalid
 
 }

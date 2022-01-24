@@ -51,8 +51,9 @@ public class FarmDetailRepositoryImpl {
 
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(criteriaBuilder.equal(root.get("metric"), type));
+        predicates.add(criteriaBuilder.notLike(root.get("metric"), "%Invalid%"));
 
-        Predicate whereClause = criteriaBuilder.and(predicates.get(0));
+        Predicate whereClause = criteriaBuilder.and(predicates.get(0), predicates.get(1));
         CriteriaQuery<FarmDetail> query = criteriaQuery.select(root).where(whereClause);
 
         return entityManager.createQuery(query).getResultList();
