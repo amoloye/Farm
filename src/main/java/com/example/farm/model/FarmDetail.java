@@ -19,20 +19,18 @@ import java.time.LocalDateTime;
 @Table(name="farm_detail")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class)
 @Builder
-
-
 public class FarmDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "farm_id")
+
+    @Enumerated(EnumType.STRING)
     private Farm farm;
 
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "metric_id")
-    private Metric metric;
+    @Enumerated(EnumType.STRING)
+    private MetricType metric;
+
     private BigDecimal metricValue; //TODO: convert to big decimal
     private LocalDateTime dateTime; //TODO: convert to localdatetime
 

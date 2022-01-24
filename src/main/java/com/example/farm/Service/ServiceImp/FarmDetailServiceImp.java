@@ -1,25 +1,29 @@
 package com.example.farm.Service.ServiceImp;
 
 import com.example.farm.Service.FarmDetailService;
+import com.example.farm.mappers.FarmMapper;
 import com.example.farm.model.FarmDetail;
-import com.example.farm.model.Metric;
+import com.example.farm.model.FarmDetailDto;
 import com.example.farm.model.MetricType;
 import com.example.farm.repository.FarmDetailRepository;
-import com.example.farm.repository.MetricRepository;
-import lombok.AllArgsConstructor;
+import com.example.farm.repository.FarmDetailRepositoryImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-@AllArgsConstructor
 @Service
 public class FarmDetailServiceImp implements FarmDetailService {
-    FarmDetailRepository farmDetailRepository;
-    MetricRepository metricRepository;
+
+    @Autowired
+    private FarmDetailRepository farmDetailRepository;
+
+    @Autowired
+    private FarmMapper farmMapper;
+
+    @Autowired
+    private FarmDetailRepositoryImpl farmDetailRepositoryImpl;
 
 
     @Override
@@ -33,29 +37,23 @@ public class FarmDetailServiceImp implements FarmDetailService {
     }
 
     @Override
-    public List<FarmDetail> fetchFarmDetailsData (LocalDateTime dateTime, MetricType type) {
+    public List<FarmDetailDto> fetchFarmDetailsByMetric (String type) {
 
-        List<FarmDetail> farmDetails = Collections.emptyList();
-        //if (dateTime==null && type == null) {
-            //farmDetails = farmDetailRepository.findAll();
-        //}
+        List<FarmDetail> details = farmDetailRepositoryImpl.findAllByMetricType(MetricType.valueOf(type));
 
-        try {
-             Optional<Metric> opType= metricRepository.findByType(type);
-             type = opType.get().getType();
-
-              String month =String.valueOf(dateTime.getMonth());
-
-
-              farmDetails = farmDetailRepository.findByMonthAndMetric(month,type);
-        }
-        catch (Exception e){
-            System.out.println("Not acceptable, input in the empty form");
-        }
-
-        return  farmDetails;
+        return farmMapper.toDto(details);
     }
 
+    @Override
+    public List<FarmDetailDto> fetchDataByMonthAndYear (String dateTime) {
+
+        LocalDateTime localDateTime = LocalDateTime.parse(dateTime);
+
+        List<FarmDetail> details = farmDetailRepositoryImpl.findByMonthAndYear(String.valueOf(localDateTime.getMonth()),
+                String.valueOf(localDateTime.getYear()));
+
+        return farmMapper.toDto(details);
+    }
 
 
 

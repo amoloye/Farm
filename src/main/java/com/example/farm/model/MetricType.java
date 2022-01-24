@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+
 @AllArgsConstructor
 public enum MetricType {
     @Min(-50)
